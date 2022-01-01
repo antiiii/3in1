@@ -23,8 +23,10 @@ int Player_Energy = 0;
 int AI_Energy = 0;
 int count = 0;
 int locate = 0;
-int index;
+int ind;
 int player;
+int chargeup;
+int chargedown;
 
 CHARACTER AI_Rock = {200, 200};
 CHARACTER AI_Scissors = {200, 200};
@@ -79,16 +81,20 @@ int Setup()
 
 void PaintMenu ()
 {
-	if (postion == 1) stopSound (zoomusic.id);
-	if (postion == 2) stopSound (clapmusic.id);
-	if (postion == 3) stopSound (sleevemusic.id);
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
 
 	postion = 0;
 	Player_Blood = 100;
 	AI_Blood = 100;
 	Player_Energy = 0;
 	AI_Energy = 0;
-	index = 0;
+	ind = 0;
+	locate = 0;
 	beginPaint();
 
 	setPenColor(EMPTY);
@@ -171,7 +177,7 @@ void MouseListener (int x, int y, int button, int event)
 		}
 	}
 
-	else if (postion == 3 && index != 4)//means in the Sleeve.
+	else if (postion == 3 && ind != 4)//means in the Sleeve.
 	{
 		if(x <= 100 && y <= 50 && button == 1 && event == 0)
 		{
@@ -363,9 +369,9 @@ void Clap_Game ()
 	putImageScale(&Shield.image, 400, 450, Shield.length, Shield.width);
 	putImageScale(&Player_Attack.image, 700, 450, Player_Attack.length, Player_Attack.width);
 
-	if (index == 0)
+	if (ind == 0)
 	{
-		player = rand() % 5;
+		player = rand() % 3;
 		if (player == 0) loadImage ("picture\\Clap-Game\\Super_Huaqiang.jpg", &Player.image);
 		else loadImage ("picture\\Clap-Game\\Huaqiang.jpg", &Player.image);
 	}
@@ -386,15 +392,15 @@ void Clap_Game ()
 	registerTimerEvent (ChargeClap);
 	startTimer (4, 1000);
 
-	loadSound("music\\clap.mp3", &clapmusic.id);
-	if (index == 0) playSound(clapmusic.id, 5);
+	// loadSound("music\\clap.mp3", &clapmusic.id);
+	// if (ind == 0) playSound(clapmusic.id, 5);
 	
 	registerMouseEvent (MouseListener);
 }
 
 void PutClap ()
 {
-	index ++;
+	ind ++;
 	beginPaint();
 
 	setBrushColor(RGB(66, 188, 172));
@@ -437,7 +443,7 @@ void PutClap ()
 
 void PutShield ()
 {
-	index ++;
+	ind ++;
 	beginPaint();
 
 	setBrushColor(RGB(66, 188, 172));
@@ -476,7 +482,7 @@ void PutShield ()
 
 void PutAttack ()
 {
-	index ++;
+	ind ++;
 	beginPaint();
 
 	setBrushColor(RGB(66, 188, 172));
@@ -555,7 +561,7 @@ void Sleeve()
 {
 	postion = 3;
 
-	if (index == 4)
+	if (ind == 4)
 	{
 		registerTimerEvent (Win);
 		startTimer (1, 2000);
@@ -571,13 +577,13 @@ void Sleeve()
 
 	setBrushColor (RGB(129, 99, 189));
 	setPenColor (RGB(255, 234, 0));
-	for (int i = 100 + index * 200; i <= 700; i += 200)
+	for (int i = 100 + ind * 200; i <= 700; i += 200)
 	{
 		rectangle (i, 210, i + 100, 310);
 		rectangle (i, 360, i + 100, 460);
 	}
 
-	if (index == 0)
+	if (ind == 0)
 	{
 		player = rand() % 3;
 		if (player == 0) loadImage ("picture\\Sleeve_Fish\\WuJing.jpg", &Player.image);
@@ -602,14 +608,15 @@ void Sleeve()
 	
 	endPaint ();
 
-	loadSound("music\\sleeve.mp3", &sleevemusic.id);
-	if(index == 0) playSound(sleevemusic.id, 5);
+	// loadSound("music\\sleeve.mp3", &sleevemusic.id);
+	// if(ind == 0) playSound(sleevemusic.id, 5);
 
 	registerMouseEvent (MouseListener);
 }
 
 void UpBlock ()
 {
+	chargeup = rand() % 2;
 	count = 100;
 	locate = 1;
 	beginPaint();
@@ -622,34 +629,52 @@ void UpBlock ()
 
 	setBrushColor (RGB(129, 99, 189));
 	setPenColor (RGB(255, 234, 0));
-	for (int i = 100 + index * 200; i <= 500; i += 200)
+	for (int i = 100 + ind * 200; i <= 500; i += 200)
 	{
 		rectangle (i, 210, i + 100, 310);
 		rectangle (i, 360, i + 100, 460);
 	}
 	rectangle (700, 360 ,800, 460);
 
-	int charge = rand() % 2;
-
-	switch (charge)
+	if (chargeup == 0) 
 	{
-		case 0:
-			endPaint ();
-			registerTimerEvent (UpDie);
-			startTimer (6, 250);
-			break;
-		case 1:
-			putImageScale (&Player.image, 700, 210, 100, 100);
-			endPaint ();
-			index ++;
-			registerTimerEvent (Back_Game3);
-			startTimer (8, 1000);
-			break;
+		for (int i = 0; i < 50; i++)
+		{
+			stopSound (zoomusic.id);
+			stopSound (clapmusic.id);
+			stopSound (sleevemusic.id);
+		}
+		endPaint ();
+		registerTimerEvent (UpDie);
+		startTimer (6, 250);
+	}
+	else if (chargeup == 1)
+	{
+		if (ind == 3)
+		{
+			for (int i = 0; i < 50; i++)
+			{
+				stopSound (zoomusic.id);
+				stopSound (clapmusic.id);
+				stopSound (sleevemusic.id);
+			}
+		}
+		putImageScale (&Player.image, 700, 210, 100, 100);
+		endPaint ();
+		ind ++;
+		registerTimerEvent (Back_Game3);
+		startTimer (8, 1000);
 	}
 }
 
 void UpDie (int a)
 {
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
 	beginPaint();
 
 	setBrushColor(RGB(222, 67, 165));
@@ -660,7 +685,7 @@ void UpDie (int a)
 
 	setBrushColor (RGB(129, 99, 189));
 	setPenColor (RGB(255, 234, 0));
-	for (int i = 100 + index * 200; i <= 500; i += 200)
+	for (int i = 100 + ind * 200; i <= 500; i += 200)
 	{
 		rectangle (i, 210, i + 100, 310);
 		rectangle (i, 360, i + 100, 460);
@@ -680,7 +705,7 @@ void UpDie (int a)
 	}
 	if (count == 0 && player == 0)
 	{
-		index ++;
+		ind ++;
 		registerTimerEvent (Back_Game3);
 		startTimer (8, 1500);
 		cancelTimer (a);
@@ -702,34 +727,54 @@ void DownBlock ()
 
 	setBrushColor (RGB(129, 99, 189));
 	setPenColor (RGB(255, 234, 0));
-	for (int i = 100 + index * 200; i <= 500; i += 200)
+	for (int i = 100 + ind * 200; i <= 500; i += 200)
 	{
 		rectangle (i, 210, i + 100, 310);
 		rectangle (i, 360, i + 100, 460);
 	}
 	rectangle (700, 210 ,800, 310);
 
-	int charge = rand() % 2;
+	int chargedown = rand() % 2;
 
-	switch (charge)
+	if (chargedown == 0) 
 	{
-		case 0:
-			endPaint ();
-			registerTimerEvent (DownDie);
-			startTimer (7, 250);
-			break;
-		case 1:
-			putImageScale (&Player.image, 700, 360, 100, 100);
-			endPaint ();
-			index ++;
-			registerTimerEvent (Back_Game3);
-			startTimer (8, 1000);
-			break;
+		for (int i = 0; i < 50; i++)
+		{
+			stopSound (zoomusic.id);
+			stopSound (clapmusic.id);
+			stopSound (sleevemusic.id);
+		}
+		endPaint ();
+		registerTimerEvent (DownDie);
+		startTimer (6, 250);
+	}
+	else if (chargedown == 1)
+	{
+		if (ind == 3)
+		{
+			for (int i = 0; i < 50; i++)
+			{
+				stopSound (zoomusic.id);
+				stopSound (clapmusic.id);
+				stopSound (sleevemusic.id);
+			}
+		}
+		putImageScale (&Player.image, 700, 360, 100, 100);
+		endPaint ();
+		ind ++;
+		registerTimerEvent (Back_Game3);
+		startTimer (8, 1000);
 	}
 }
 
 void DownDie (int a)
 {
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
 	beginPaint();
 
 	setBrushColor(RGB(222, 67, 165));
@@ -740,7 +785,7 @@ void DownDie (int a)
 
 	setBrushColor (RGB(129, 99, 189));
 	setPenColor (RGB(255, 234, 0));
-	for (int i = 100 + index * 200; i <= 500; i += 200)
+	for (int i = 100 + ind * 200; i <= 500; i += 200)
 	{
 		rectangle (i, 210, i + 100, 310);
 		rectangle (i, 360, i + 100, 460);
@@ -760,7 +805,7 @@ void DownDie (int a)
 	}
 	if (count == 0 && player == 0)
 	{
-		index ++;
+		ind ++;
 		registerTimerEvent (Back_Game3);
 		startTimer (8, 1500);
 		cancelTimer (a);
@@ -770,8 +815,13 @@ void DownDie (int a)
 
 void Win (int b)
 {
-	printf("%d", postion);
-	index = 0;
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
+	ind = 0;
 	locate = 0;
 	cancelTimer (b);
 	beginPaint ();
@@ -783,17 +833,14 @@ void Win (int b)
 	switch (postion)
 	{
 		case 10:
-		stopSound (zoomusic.id);
 		registerTimerEvent(Back_Game1);
 		startTimer(3, 1500);
 		break;
 		case 2:
-		stopSound (clapmusic.id);
 		registerTimerEvent(Back_Game2);
 		startTimer (5, 1500);
 		break;
 		case 3:
-		stopSound (sleevemusic.id);
 		registerTimerEvent(Back_Game3);
 		startTimer (8, 1500);
 		break;
@@ -802,8 +849,14 @@ void Win (int b)
 
 void Lose (int b)
 {
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
 	printf("%d", postion);
-	index = 0;
+	ind = 0;
 	locate = 0;
 	cancelTimer (b);
 	beginPaint ();
@@ -815,17 +868,14 @@ void Lose (int b)
 	switch (postion)
 	{
 		case 10:
-		stopSound (zoomusic.id);
 		registerTimerEvent(Back_Game1);
 		startTimer(3, 1500);
 		break;
 		case 2:
-		stopSound (clapmusic.id);
 		registerTimerEvent(Back_Game2);
 		startTimer (5, 1500);
 		break;
 		case 3:
-		stopSound (sleevemusic.id);
 		registerTimerEvent(Back_Game3);
 		startTimer (8, 1500);
 		break;
@@ -834,6 +884,12 @@ void Lose (int b)
 
 void Hand (int b)
 {
+	for (int i = 0; i < 50; i++)
+	{
+		stopSound (zoomusic.id);
+	    stopSound (clapmusic.id);
+	    stopSound (sleevemusic.id);
+	}
 	printf("%d", postion);
 	cancelTimer (b);
 	beginPaint ();
@@ -861,7 +917,6 @@ void Hand (int b)
 
 void Back_Game1 (int a)
 {
-	printf("In the Back_Game1.");
 	cancelTimer (a);
 	Rock_Paper_Scissors ();
 }
